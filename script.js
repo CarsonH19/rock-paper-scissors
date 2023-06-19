@@ -9,42 +9,32 @@ and then return a string that declares the winner of the round like so:
  /*The function should be case-insensitive*/
 
  function getComputerChoice() {
-    const choice = ["Rock", "Paper", "Scissors"];
-    const randomIndex = Math.floor(Math.random() * choice.length);
-    return choice[randomIndex]
+    const choices = ["rock", "paper", "scissors"];
+    const computerChoice = Math.floor(Math.random() * choices.length);
+    return choices[computerChoice]
  }
+
+ 
 
  function playRound(playerSelection, computerSelection) {
     // your code here!
-    if (playerSelection === "Rock" && computerSelection === "Paper") {
+    playerSelection = playerSelection.toLowerCase();
+
+    if (playerSelection === "rock" && computerSelection === "paper") {
         return "You Lose! Paper Beats Rock!";
-    }
-
-    else if (playerSelection === "Rock" && computerSelection === "Scissors") {
+    } else if (playerSelection === "rock" && computerSelection === "scissors") {
         return "You Win! Rock Beats Scissors!";
-    }
-
-    else if (playerSelection === "Paper" && computerSelection === "Rock") {
-        return "You Win! Rock Beats Paper!";
-    }
-
-    else if (playerSelection === "Paper" && computerSelection === "Scissors") {
-        return "You Lose! Scissors Beats Paper!"
-    }
-
-    else if (playerSelection === "Scissors" && computerSelection === "Rock") {
+    } else if (playerSelection === "paper" && computerSelection === "rock") {
+        return "You Win! Paper Beats Paper!";
+    } else if (playerSelection === "paper" && computerSelection === "scissors") {
+        return "You Lose! Scissors Beats Paper!";
+    } else if (playerSelection === "scissors" && computerSelection === "rock") {
         return "You Lose! Rock Beats Scissors!";
-    }
-
-    else if (playerSelection === "Scissors" && computerSelection === "Paper") {
-        return "You Win! Scissors Beats Paper!"
-    }
-
-    else {
+    } else if (playerSelection === "scissors" && computerSelection === "paper") {
+        return "You Win! Scissors Beats Paper!";
+    } else {
         return "No Winner!";
     }
-       
-
   }
    
   const playerSelection = "rock";

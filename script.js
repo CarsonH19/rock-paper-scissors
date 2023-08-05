@@ -1,82 +1,167 @@
-/* Write a function called getComputerChoice to randomly select 
-'Rock', 'Paper' or 'Scissors'. */
+// GAME
 
-/* Write a function that plays a single round of rock-paper-scissors, 
-The function should take two parameters - the playerSelection and computerSelection -
-and then return a string that declares the winner of the round like so:
- "You Lose! Paper beats Rock" */
+let playerScore = 0;
+let computerScore = 0;
+let roundWinner = '';
 
-
-// Function to generate computer's choice
-function computerPlay() {
-  const choices = ['rock', 'paper', 'scissors'];
-  const randomIndex = Math.floor(Math.random() * choices.length);
-  return choices[randomIndex];
-}
-
-// Function to play a single round of Rock Paper Scissors
 function playRound(playerSelection, computerSelection) {
-  // Convert player's selection to lowercase
-  playerSelection = playerSelection.toLowerCase();
-
-  // Check for a tie
   if (playerSelection === computerSelection) {
-    return "It's a tie!";
+    roundWinner = 'tie';
   }
+  if (
+    (playerSelection === 'ROCK' && computerSelection === 'SCISSORS') ||
+    (playerSelection === 'SCISSORS' && computerSelection === 'PAPER') ||
+    (playerSelection === 'PAPER' && computerSelection === 'ROCK')
+  ) {
+    playerScore++;
+    roundWinner = 'player';
+  } 
+  if (
+    (computerSelection === 'ROCK' && playerSelection === 'SCISSORS') ||
+    (computerSelection === 'SCISSORS' && playerSelection === 'PAPER') ||
+    (computerSelection === "PAPER" && playerSelection === 'ROCK') 
+  ) {
+    computerScore++;
+    roundWinner = 'computer';
+  }
+  updateScoreMessage(roundWinner, playerSelection, computerSelection);
+}
 
-  // Check all possible player choices and determine the winner
-  if (playerSelection === 'rock') {
-    if (computerSelection === 'paper') {
-      return 'You lose! Paper beats rock.';
-    } else {
-      return 'You win! Rock beats scissors.';
-    }
-  } else if (playerSelection === 'paper') {
-    if (computerSelection === 'scissors') {
-      return 'You lose! Scissors beat paper.';
-    } else {
-      return 'You win! Paper beats rock.';
-    }
-  } else if (playerSelection === 'scissors') {
-    if (computerSelection === 'rock') {
-      return 'You lose! Rock beats scissors.';
-    } else {
-      return 'You win! Scissors beat paper.';
-    }
-  } else {
-    return 'Invalid selection. Please choose rock, paper, or scissors.';
+function getRandomChoice() {
+  let randomNumber = Math.floor(Math.random() * 3);
+  switch (randomNumber) {
+    case 0:
+      return 'ROCK';
+    case 1:
+      return 'PAPER';
+    case 2:
+      return 'SCISSORS';
   }
 }
 
-// Function to start the game
-function game() {
-  let playerScore = 0;
-  let computerScore = 0;
+function isGameOver() {
+  return playerScore === 5 || computerScore === 5;
+}
 
-  // Play 5 rounds
-  for (let i = 0; i < 5; i++) {
-    const playerSelection = prompt('Enter your choice: rock, paper, or scissors');
-    const computerSelection = computerPlay();
-    const roundResult = playRound(playerSelection, computerSelection);
-    console.log(roundResult);
+// DOM Manipulation & UI
+const rockButton = document.getElementById('rockButton');
+const paperButton = document.getElementById('paperButton');
+const scissorsButton = document.getElementById('scissorsButton');
+const scoreInfo = document.getElementById('scoreInfo');
+const scoreMessage = document.getElementById('scoreMessage');
+const playerScorePara = document.getElementById('playerScore');
+const computerScorePara = document.getElementById('computerScore');
+const playerSign = document.getElementById('playerSign');
+const computerSign = document.getElementById('computerSign');
+const endgameModal = document.getElementById('endgameModal');
+const endgameMsg = document.getElementById('endgameMsg');
+const overlay = document.getElementById('overlay');
+const restartButton = document.getElementById('restartButton');
 
-    // Update scores
-    if (roundResult.includes('win')) {
-      playerScore++;
-    } else if (roundResult.includes('lose')) {
-      computerScore++;
-    }
+rockButton.addEventListener('click', () => handleClick('ROCK'));
+paperButton.addEventListener('click', () => handleClick('PAPER'));
+scissorsButton.addEventListener('click', () => handleClick('SCISSORS'));
+restartButton.addEventListener('click', restartGame);
+overlay.addEventListener('click', closeEndgameModal);
+
+function handleClick(playerSelection) {
+  if (isGameOver()) {
+    openEndgameModal();
+    return;
   }
 
-  // Determine the winner of the game
-  if (playerScore > computerScore) {
-    console.log('Congratulations! You won the game.');
-  } else if (playerScore < computerScore) {
-    console.log('Sorry! You lost the game.');
-  } else {
-    console.log("It's a tie game.");
+  const computerSelection = getRandomChoice();
+  playRound(playerSelection, computerSelection);
+  updateChoices(playerSelection,computerSelection);
+  updateScore();
+
+  if (isGameOver()) {
+    openEndgameModal();
+    setFinalMessage();
   }
 }
 
-// Start the game
-game();
+function updateChoices(playerSelection,computerSelection) {
+  switch (playerSelection) {
+    case 'ROCK':
+      playerSign.textContent = 'ROCK';
+      break;
+    case 'PAPER':
+      playerSign.textContent = 'PAPER';
+      break;
+    case 'SCISSORS':
+      playerSign.textContent = 'SCISSORS';
+      break;
+  }
+
+  switch (computerSelection) {
+    case 'ROCK':
+      computerSign.textContent = 'ROCK';
+      break;
+    case 'PAPER':
+      computerSign.textContent = 'PAPER';
+      break;
+    case 'SCISSORS':
+      computerSign.textContent = 'SCISSORS';
+      break;
+  }
+}
+
+function updateScore() {
+  if (roundWinner === 'tie') {
+    scoreInfo.textContent = "It's a tie";
+  } else if (roundWinner === 'player') {
+    scoreInfo.textContent = 'You won!';
+  } else if (roundWinner === 'computer') {
+    scoreInfo.textContent = 'You lost!';
+  }
+  
+  playerScorePara.textContent = `Player: ${playerScore}`;
+  computerScorePara.textContent = `Computer: ${computerScore}`;
+}
+
+function updateScoreMessage(winner, playerSelection, computerSelection) {
+  if (winner === 'player') {
+    scoreMessage.textContent = `${capitalizeFirstLetter(playerSelection)} beats ${computerSelection.toLowerCase()}`;
+    return;
+  }
+  if (winner === 'computer') {
+    scoreMessage.textContent = `${capitalizeFirstLetter(playerSelection)} is beaten by ${computerSelection.toLowerCase()}`;
+    return;
+  }
+
+  scoreMessage.textContent = `${capitalizeFirstLetter(playerSelection)} ties with ${computerSelection.toLowerCase()}`;
+}
+
+function capitalizeFirstLetter(string) {
+  return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
+}
+
+function openEndgameModal() {
+  endgameModal.classList.add('active');
+  overlay.classList.add('active');
+}
+
+function closeEndgameModal() {
+  endgameModal.classList.remove('active');
+  overlay.classList.remove('active');
+}
+
+function setFinalMessage() {
+  return playerScore > computerScore
+    ? (endgameMsg.textContent = 'You won!')
+    : (endgameMsg.textContent = 'You lost...')
+}
+
+function restartGame() {
+  playerScore = 0;
+  computerScore = 0;
+  scoreInfo.textContent = 'Choose wisely';
+  scoreMessage.textContent = 'First to score 5 points wins the game!';
+  playerScorePara.textContent = 'Player: 0';
+  computerScorePara.textContent = 'Computer: 0';
+  playerSign.textContent = ' ? ';
+  computerSign.textContent = ' ? ';
+  endgameModal.classList.remove('active');
+  overlay.classList.remove('active');
+}
